@@ -28,11 +28,21 @@
 }
 
 .chat-display {
-  height: 300px;
+  height: 400px;
+  overflow-y: scroll;
 }
 
 .users-display {
-  height: 300px;
+  height: 400px;
+}
+
+.card-title {
+  margin: 0;
+}
+
+.card-body {
+  /* width: 18rem; */
+  padding: 0.5rem;
 }
 
 

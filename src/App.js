@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { subscribeToTimer } from './api';
+import * as api from './api';
 
 import logo from './logo.svg';
 import './App.css';
@@ -14,10 +14,11 @@ class App extends Component {
     this.state = {
       timeStamp: 'No timestamp yet...',
       loggedOn: true,
+      userName: 'Mauricio',
       users: [],
     }
 
-    subscribeToTimer( (err, timestamp) => this.setState({ timestamp }) );
+    // api.subscribeToTimer( (err, timestamp) => this.setState({ timestamp }) );
   }
 
   render() {
@@ -45,6 +46,7 @@ class App extends Component {
 
         <Chat
           loggedOn={this.state.loggedOn}
+          userName={this.state.userName}
           users={this.state.users}
         />
 
@@ -67,12 +69,12 @@ class Login extends Component {
           <form className="row">
             <div className="col-md-4 offset-md-4">
               <div className="form-group">
-                <label for="exampleInputEmail1">Email address</label>
+                <label htmlFor="exampleInputEmail1">Email address</label>
                 <input type="email" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email"/>
                 <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small>
               </div>
               <div className="form-group">
-                <label for="exampleInputPassword1">Password</label>
+                <label htmlFor="exampleInputPassword1">Password</label>
                 <input type="password" className="form-control" id="exampleInputPassword1" placeholder="Password"/>
               </div>
               <div className="col text-right">
@@ -91,6 +93,28 @@ class Login extends Component {
 class Chat extends Component {
   constructor(props) {
     super(props);
+    
+    this.state = {
+      userMessage: '',
+    }
+
+    this.inputChange = this.inputChange.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
+  }
+
+  inputChange(event) {
+    this.setState({userMessage: event.target.value});
+  }
+
+  sendMessage(event) {
+    event.preventDefault();
+    console.log('msg sent: ', this.state.userMessage);
+
+    // send message to back-end
+    api.emitMessage(this.props.userName, this.state.userMessage, new Date());
+
+    // clear message from input element
+    this.setState({userMessage: ''});    
   }
 
   render() {
@@ -100,6 +124,7 @@ class Chat extends Component {
           <div className="row">
 
             <div className="col-md-2"></div>
+
             <div className="col-md-6">
 
               <div className="row">
@@ -108,20 +133,30 @@ class Chat extends Component {
                 </div>
               </div>
 
+              {/* DISPLAY MESSAGES FROM BACK-END */}
               <div className="row">
-                <div className="col chat-display" id="chatDisplay">
-
+                <div className="col chat-display-container-col">
+                  <ChatMessages/>
                 </div>
               </div>
 
+              {/* SUBMIT MESSAGES TO BACK-END */}
               <div className="row">
                 <div className="col">
-                  <div className="input-group mb-3">
-                    <input type="text" className="form-control" placeholder="Enter message here" aria-label="Enter message here" aria-describedby="basic-addon2"/>
+                  <form className="input-group mb-3" onSubmit={this.sendMessage}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter message here"
+                      aria-label="Enter message here" 
+                      aria-describedby="basic-addon2"
+                      value={this.state.userMessage}
+                      onChange={this.inputChange}
+                    />
                     <div className="input-group-append">
-                      <button className="btn btn-outline-secondary" type="button">Send!</button>
+                      <button className="btn btn-outline-secondary" type="submit">Send!</button>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
 
@@ -137,5 +172,82 @@ class Chat extends Component {
     );
   }
 }
+
+
+class ChatMessages extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      messages: [],
+    }
+
+    api.getChatHistory((err, messages) => {
+      console.log('RECEIVED: chat history: ', messages);
+      this.setState({ messages });
+    });
+
+    api.subscribeToChat((err, message) => {
+      console.log('RECEIVED: chat message: ', message);
+      this.setState({ messages: [ ...this.state.messages, message] });
+    });
+
+    this.displayMsgs = this.displayMsgs.bind(this);
+  }
+  
+  displayMsgs(message) {
+  }
+
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+  
+  componentDidMount() {
+    this.scrollToBottom();
+  }
+  
+  componentDidUpdate() {
+    this.scrollToBottom();
+  }
+
+  render() {
+    const displayAllMsgs = this.state.messages.map((message, index) => {
+      console.log('msg obj: ', message);
+
+      const options = {
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      }
+      const date = new Date(message.date).toLocaleDateString('en-US', options);
+    return (
+      <div className="row" key={"msg-" + index}>
+        <div className="col">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">{message.userName}</h5>
+              <small className="card-subtitle mb-2 text-muted">{date}</small>
+              <p className="card-text">{message.content}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+    });
+    console.log('displayAllMsgs: ', displayAllMsgs);
+    return (
+      <div className="row">
+        <div className="col chat-display" id="chatDisplay">
+          {displayAllMsgs}          
+          <div ref={(el) => { this.messagesEnd = el }}></div>
+        </div>
+      </div>
+    );
+  }
+}
+
+
 
 export default App;

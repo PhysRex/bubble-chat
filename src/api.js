@@ -11,6 +11,7 @@ const socket = openSocket('http://localhost:8080');
  * @returns {undefined}
  */
 function subscribeToTimer(cb) {
+  console.log('REQUEST: get time from server');
   // subscribe to timer event
   socket.on('timer', timestamp => cb(null, timestamp));
 
@@ -18,4 +19,47 @@ function subscribeToTimer(cb) {
   socket.emit('subscribeToTimer', 1000);
 }
 
-export { subscribeToTimer };
+/**
+ * Subscribe to chat events
+ * @param {function} cb callback function
+ * @returns {undefined}
+ */
+function subscribeToChat(cb) {
+  console.log('REQUEST: subscribe to chat');
+  // subscribe to chat event
+  socket.on('send', message => cb(null, message));
+
+  // emit this event every 1s
+  socket.emit('subscribeToTimer', 1000);
+}
+
+/**
+ * Subscribe to chat history events
+ * @param {function} cb callback function
+ * @returns {undefined}
+ */
+function getChatHistory(cb) {
+  console.log('REQUEST: get chat history');
+  
+  // subscribe to chat event
+  socket.on('message_history', messages => cb(null, messages));
+  
+  // emit this event every 1s
+  socket.emit('get_messages');
+}
+
+function emitMessage(userName, content, date) {
+  console.log('REQUEST: send chat msg');  
+  socket.emit('message', {
+    userName,
+    content,
+    date,
+  });
+}
+
+export {
+  subscribeToTimer,
+  subscribeToChat,
+  getChatHistory,
+  emitMessage,
+};
