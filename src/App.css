@@ -1,0 +1,47 @@
+.row {
+	border: 1px solid red;
+}
+
+[class^="col"] {
+	border: 1px solid blue;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+
+
+
+/* login ######################################## */
+.login-row {
+  /* display:  */
+}
+
+
+
+
+/* chat ######################################## */
+.chat-row {
+  display: none;
+}
+
+.chat-display {
+  height: 300px;
+}
+
+.users-display {
+  height: 300px;
+}
+
+
+
+/* general ######################################## */
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
