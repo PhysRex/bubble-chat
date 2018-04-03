@@ -1,6 +1,10 @@
 import openSocket from 'socket.io-client';
 
-const socket = openSocket('http://localhost:8080');
+
+// Connect to back-end server
+const url = '192.168.2.6'
+const port = 8080;
+const socket = openSocket(`${url}:${port}`);
 
 /**
  * Subscribe to timer events
@@ -34,6 +38,28 @@ function subscribeToChat(cb) {
 }
 
 /**
+ * Subscribe to users events
+ * @param {function} cb callback function
+ * @returns {undefined}
+ */
+function subscribeToUsers(cb) {
+  console.log('REQUEST: subscribe to chat');
+  // subscribe to chat event
+  socket.on('joined', message => cb(null, message));
+
+  // emit this event every 1s
+  socket.emit('get_users');
+}
+
+function emitJoin(userName, password = '') {
+  console.log('REQUEST: user joins chat');  
+  socket.emit('join', {
+    userName,
+    password,
+  });
+}
+
+/**
  * Subscribe to chat history events
  * @param {function} cb callback function
  * @returns {undefined}
@@ -57,9 +83,21 @@ function emitMessage(userName, content, date) {
   });
 }
 
+function getQuote(cb) {
+  console.log('REQUEST: subscribe to quote');
+  // subscribe to quote event
+  socket.on('random_quote', quote => cb(null, quote));
+
+  // emit this event
+  socket.emit('get_quote');
+}
+
 export {
   subscribeToTimer,
   subscribeToChat,
+  subscribeToUsers,
+  emitJoin,
   getChatHistory,
   emitMessage,
+  getQuote,
 };

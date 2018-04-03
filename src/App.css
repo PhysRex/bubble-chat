@@ -1,10 +1,10 @@
-.row {
+/* .row {
 	border: 1px solid red;
 }
 
 [class^="col"] {
 	border: 1px solid blue;
-}
+} */
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
@@ -16,18 +16,45 @@
 
 /* login ######################################## */
 .login-row {
-  /* display:  */
+  margin: 2rem 0;
+}
+
+.inputError, .inputError:focus {
+  border: 1px solid rgb(238, 78, 78);
+  box-shadow: 0 0 0 0.2rem rgba(238, 78, 78, 0.45);
+  background: rgba(238, 78, 78, 0.2);
+}
+
+#form-login {
+  /* margin-bottom: 1rem; */
+}
+
+#form-login:focus {
+  /* box-shadow: 0 0 0 0.2rem rgba(238, 78, 78, 0.25); */
+}
+
+.login-quote-col {
+  margin: 1.5rem 0;
 }
 
 
 
-
 /* chat ######################################## */
+.chat-display-container-col {
+  margin: 0.5rem 0;
+
+  /* background: rgb(172, 219, 248); */
+
+  box-shadow: inset 0px 0px 39px 0px rgba(255, 255, 255, 0.82);
+  box-shadow: 0px 0px 39px 0px rgba(255, 255, 255, 1);
+}
+
 .chat-row {
   display: none;
 }
 
 .chat-display {
+  padding: 1rem;
   height: 400px;
   overflow-y: scroll;
 }
@@ -36,13 +63,21 @@
   height: 400px;
 }
 
+.card {
+  margin: 0.5rem;
+
+  background: rgb(252, 148, 148);
+
+  box-shadow: 0px 0px 15px -1px rgba(0, 0, 0, 0.82);  
+}
+
 .card-title {
   margin: 0;
 }
 
 .card-body {
   /* width: 18rem; */
-  padding: 0.5rem;
+  padding: 0.1rem 0.5rem;
 }
 
 
@@ -55,3 +90,38 @@
 .show {
   display: block;
 }
+
+
+
+/* 
+// #################################
+// ##### Scrollbar css styling #####
+// ##### --------------------- #####
+*/
+#recipePanel {
+  /* display: flex; */
+}
+
+#chatDisplay {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 50vh;
+  /* padding-top: -2px !important */
+  /* padding-right: 5px !important */
+}
+
+#chatDisplay::-webkit-scrollbar {
+  width: 0.5em;
+  /* height: 2em; */
+}
+
+#chatDisplay::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+#chatDisplay::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 0.3 solid slategrey;
+}
+
+/* // ################################# */
