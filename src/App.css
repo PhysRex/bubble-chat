@@ -34,7 +34,7 @@
 }
 
 .login-quote-col {
-  margin: 1.5rem 0;
+  /* margin: 1.5rem 0; */
 }
 
 
@@ -45,8 +45,8 @@
 
   /* background: rgb(172, 219, 248); */
 
-  box-shadow: inset 0px 0px 39px 0px rgba(255, 255, 255, 0.82);
-  box-shadow: 0px 0px 39px 0px rgba(255, 255, 255, 1);
+  /* box-shadow: inset 0px 0px 39px 0px rgba(255, 255, 255, 0.82); */
+  /* box-shadow: 0px 0px 39px 0px rgba(255, 255, 255, 1); */
 }
 
 .chat-row {
@@ -57,18 +57,66 @@
   padding: 1rem;
   height: 400px;
   overflow-y: scroll;
+  
 }
 
 .users-display {
   height: 400px;
 }
 
+.chat-shadow {
+  z-index: 10;
+  width: 100%;
+}
+
+.chat-shadow-top {
+  box-shadow: 0px 10px 20px 20px #fff, inset  0px 0px 20px 20px #fff;
+}
+
+.chat-shadow-bottom {
+  box-shadow: 0px -10px 20px 20px #fff, inset  0px 0px 20px 20px #fff;
+}
+
 .card {
   margin: 0.5rem;
+  /* width: 85%; */
 
-  background: rgb(252, 148, 148);
+  /* background: rgb(255, 165, 165); */
+  /* rgb(255, 220, 138) */
 
   box-shadow: 0px 0px 15px -1px rgba(0, 0, 0, 0.82);  
+}
+
+.user {
+  background: rgb(255, 165, 165); /* red */
+}
+
+.yellow {
+  background: rgb(255, 220, 138);
+}
+
+.blue {
+  background: #577590;
+}
+
+.orange {
+  background: #F08A4B;
+}
+
+.brown {
+  background: #754F44;
+}
+
+.green {
+  background: #C9F2C7;
+  /* background: #ACECA1; */
+  /* background: #96BE8C; */
+  /* background: #629460; */
+  /* background: #243119; */
+}
+
+.lightRed {
+  background: #EC7357;
 }
 
 .card-title {
@@ -80,6 +128,9 @@
   padding: 0.1rem 0.5rem;
 }
 
+.input-row * {
+  z-index: 20;
+}
 
 
 /* general ######################################## */
@@ -102,7 +153,7 @@
   /* display: flex; */
 }
 
-#chatDisplay {
+#chatDisplay, #userDisplay {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 50vh;

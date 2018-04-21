@@ -3,7 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import * as api from './api';
 
-import logo from './logo.svg';
+// import logo from './logo.svg';
+import logo from './Imletired-clr.png';
 import './App.css';
 
 
@@ -14,7 +15,7 @@ class App extends Component {
     this.state = {
       timeStamp: 'No timestamp yet...',
       loggedOn: false,
-      userName: '',
+      userName: 'dev',
       users: [],
     }
 
@@ -80,46 +81,59 @@ class Login extends Component {
       quoteText: 'Why fit in when you were born to stand out?',
     }
 
-    // api.getQuote( (err, quote) => this.setState({ ...quote }) );
-
     this.inputChange = this.inputChange.bind(this);
     this.joinChat = this.joinChat.bind(this);
     this.validation = this.validation.bind(this);
   }
 
   inputChange(event) {
+    const userNameLength = event.target.value.length;
     this.setState({userName: event.target.value});
-    // if (this.state.userName.length > 1) this.setState({ error: false });    
+    if (userNameLength > 0) {
+      // console.log('this.state.userName', this.state.userName);
+      // console.log('this.state.userName.length', this.state.userName.length);
+      this.setState({ error: false });
+    }
   }
 
   joinChat(event) {
     event.preventDefault();
+    const validation = this.validation();
 
     // user name validation
-    if (this.validation()) {
+    if (!validation) {
       // change 'logged on' status
       const bool = this.props.loggedOn ? false : true;
-      console.log('  >> bool: ', bool);
       this.props.changeLoggedStatus(bool);
   
       // send username to parent state
       this.props.setUserName(this.state.userName);
+      
+      // emit join event to server
+      api.emitJoin(this.state.userName);
+    } else {
+      console.log('Oops... something\'s not working!');
     }
+  }
+
+  validation() {
+    console.log('this.state.userName.length ', this.state.userName.length);
+    let error = this.state.error;
+    if (this.state.userName.length === 0) {
+      error = true;
+    }
+    this.setState({ error });
+    return error;
+  }
+
+  // will fire after state update
+  componentDidUpdate() {
+    // code here...
   }
 
   // Called after the component has been rendered into the page
 	componentWillMount() {
     api.getQuote( (err, quote) => this.setState({ ...quote }) );
-  }
-
-  validation() {
-    // code here...
-    if (this.state.userName.length === 0) {
-      this.setState({ error: true });
-      console.log('\n############  USER NAME EMPTY...  ############\n');
-    }
-
-    return this.state.error;
   }
 
   render() {
@@ -128,7 +142,7 @@ class Login extends Component {
         <div className="col">
 
           <form className="row" onSubmit={this.joinChat}>
-            <div className="col-md-6 offset-md-3">
+            <div className="col-md-6 offset-md-3 col-lg-4 offset-lg-4">
               <div className="form-group">
                 <label htmlFor="exampleInputEmail1">Name</label>
                 <div className="input-group mb-3">
@@ -146,17 +160,6 @@ class Login extends Component {
                     <button type="submit" className="btn btn-outline-secondary">Enter</button>
                   </div>
                 </div>
-
-                <div className="row">
-                  <div className="col login-quote-col">
-                    <small className="form-text text-muted">
-                      &quot;{this.state.quoteText}&quot;
-                    </small>
-                    <cite className="small form-text text-muted text-right">
-                      {this.state.quoteAuthor}
-                    </cite>
-                  </div>
-                </div>
               </div>
               <div className="form-group hide">
                 <label htmlFor="exampleInputPassword1">Password</label>
@@ -164,6 +167,18 @@ class Login extends Component {
               </div>
             </div>
           </form>
+
+
+          <div className="row">
+            <div className="col-md-6 offset-md-3 col-lg-4 offset-lg-4 login-quote-col">
+              <small className="form-text text-muted">
+                &quot;{this.state.quoteText}&quot;
+              </small>
+              <cite className="small form-text text-muted text-right">
+                {this.state.quoteAuthor}
+              </cite>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -199,6 +214,11 @@ class Chat extends Component {
     this.setState({userMessage: ''});    
   }
 
+  componentDidMount(){
+    // console.log(this);
+    // this.querySelector('.form-control').focus();
+  }
+
   render() {
     return (
       <div className={"chat-row row " + (this.props.loggedOn ? 'show' : '')}>
@@ -209,21 +229,27 @@ class Chat extends Component {
 
             <div className="col-md-6">
 
-              <div className="row">
+              {/* <div className="row">
                 <div className="col" id="usersLogged">
                   users logged on: {this.props.users.length}
                 </div>
-              </div>
+              </div> */}
 
               {/* DISPLAY MESSAGES FROM BACK-END */}
               <div className="row">
+                <div className="row chat-shadow chat-shadow-top">
+                  <div className="col"></div>
+                </div>
                 <div className="col chat-display-container-col">
-                  <ChatMessages/>
+                  <ChatMessages userName={this.props.userName}/>
+                </div>
+                <div className="row chat-shadow chat-shadow-bottom">
+                  <div className="col"></div>              
                 </div>
               </div>
 
               {/* SUBMIT MESSAGES TO BACK-END */}
-              <div className="row">
+              <div className="row input-row">
                 <div className="col">
                   <form className="input-group mb-3" onSubmit={this.sendMessage}>
                     <input
@@ -234,7 +260,6 @@ class Chat extends Component {
                       aria-describedby="basic-addon2"
                       value={this.state.userMessage}
                       onChange={this.inputChange}
-                      autoFocus
                       autoComplete="off"
                     />
                     <div className="input-group-append">
@@ -247,7 +272,13 @@ class Chat extends Component {
             </div>
 
             <div className="col-md-3 users-display" id="usersDisplay">
-              <p>users list here...</p>
+              {/* <p>users list here...</p> */}
+              <div className="row">
+                <div className="col">
+                  <UserList userName={this.props.userName}/>
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -275,13 +306,8 @@ class ChatMessages extends Component {
       console.log('RECEIVED: chat message: ', message);
       this.setState({ messages: [ ...this.state.messages, message] });
     });
-
-    this.displayMsgs = this.displayMsgs.bind(this);
   }
   
-  displayMsgs(message) {
-  }
-
   scrollToBottom = () => { // TODO: make more 'react'-like
     const chatDisplay = document.getElementById('chatDisplay');
     // this.messagesEnd.scrollIntoView({ behavior: "smooth" });
@@ -300,34 +326,41 @@ class ChatMessages extends Component {
   }
 
   render() {
-    const displayAllMsgs = this.state.messages.map((message, index) => {
-      console.log('msg obj: ', message);
-
-      // set date format for each msg displayed
-      const options = {
-        month: 'short',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }
-      const date = new Date(message.date).toLocaleDateString('en-US', options);
-
-      // set jsx for each msg displayed
-      return (
-        <div className="row" key={"msg-" + index}>
-          <div className="col">
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{message.userName}</h5>
-                <small className="card-subtitle mb-2 text-muted">{date}</small>
-                <p className="card-text">{message.content}</p>
+    let displayAllMsgs = '';
+    if (this.state.messages.length > 0) {
+      displayAllMsgs = this.state.messages.map((message, index) => {
+        console.log('msg obj: ', message);
+  
+        // set date format for each msg displayed
+        const options = {
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }
+        console.log('message: ', message)
+        const date = new Date(message.date).toLocaleDateString('en-US', options);
+        const userTest = message.userName === this.props.userName;
+  
+        // set jsx for each msg displayed
+        return (
+          <div className="row" key={"msg-" + index}>
+            <div className={"col-xs-10 col-sm-10 col-md-10 " + (userTest ? "offset-xs-2 offset-sm-2 offset-md-2" : "" )}>
+              <div className={"card " + (userTest ? "user" : "yellow" )}>
+                <div className="card-body">
+                <div className="">
+                  <h5 className="card-title">{message.userName}<small className="card-subtitle mb-2 text-muted">{date}</small></h5>
+                  
+                </div>
+                  <p className="card-text">{message.content}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      );
-    });
+        );
+      });
+    }
 
     return (
       <div className="row">
@@ -335,6 +368,66 @@ class ChatMessages extends Component {
           {displayAllMsgs}
           {/* // TODO: remove next line when 'scroll' function is more polished? */}
           <div ref={(el) => { this.messagesEnd = el }}></div>
+        </div>
+      </div>
+    );
+  }
+}
+
+
+class UserList extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      users: [],
+    }
+
+    api.subscribeToUsers((err, users) => {
+      console.log('RECEIVED: users list: ', users);
+      this.setState({ users });
+    });
+  }
+
+  render() {
+    let displayAllUsers = '';
+    console.log('users:', this.state.users);
+    console.log('users length: ', this.state.users.length);
+    if (this.state.users.length > 0) {
+      displayAllUsers = this.state.users.map((user, index) => {
+        console.log('  >> user: ', user);
+  
+        // set date format for each msg displayed
+        const options = {
+          month: 'short',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }
+        const userTest = user === this.props.userName;
+  
+        // set jsx for each msg displayed
+        return (
+          <div className="row" key={"user-" + index}>
+            <div className="col-md-10 offset-md-2">
+              <div className={"card " + (userTest ? "user" : "yellow" )}>
+                <div className="card-body">
+                  <p className="card-text">{user}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      });
+    }
+
+    return (
+      <div className="row">
+        <div className="col chat-display" id="userDisplay">
+        <div className="chat-shadow-top"></div>        
+          {displayAllUsers}
+          <div className="chat-shadow-bottom"></div>
         </div>
       </div>
     );

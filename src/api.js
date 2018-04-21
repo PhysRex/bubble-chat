@@ -2,9 +2,10 @@ import openSocket from 'socket.io-client';
 
 
 // Connect to back-end server
-const url = '192.168.2.6'
-const port = 8080;
-const socket = openSocket(`${url}:${port}`);
+const url = 'localhost';
+// const url = 'ec2-52-24-28-205.us-west-2.compute.amazonaws.com';
+const port = 3001;
+const socket = openSocket(`http://${url}:${port}`);
 
 /**
  * Subscribe to timer events
@@ -52,11 +53,8 @@ function subscribeToUsers(cb) {
 }
 
 function emitJoin(userName, password = '') {
-  console.log('REQUEST: user joins chat');  
-  socket.emit('join', {
-    userName,
-    password,
-  });
+  console.log(`REQUEST: ${userName} joins chat`);
+  socket.emit('join', { userName, password });
 }
 
 /**
